@@ -47,6 +47,8 @@ var Manic = new function () {
                 console.log('loaded Navigo');
 
                 return new Navigo('/manic', true).on({
+                    // get a list of routing defonitions from
+                    // several routing apps/plug-ins
                     'changelog/list': () => {
                         self.getJSON('changelog').then(response => {
                             console.log(response);
@@ -54,6 +56,10 @@ var Manic = new function () {
 
                         console.log('changlog-list');
                     },
+                    // provide level separator such as ":" for
+                    // extracting information about the connection
+                    // e.g. between a category and an individual
+                    // data entry
                     'changelog/:id': params => {
                         jsonRequest.options.url = './data/changelog.json';
                         jsonRequest.setHeader('M-Request-Type', 'Info');
@@ -187,6 +193,7 @@ var Manic = new function () {
         "use strict";
         var self = this;
 
+        // check if script - url is an array
         if (self.isArray(scripts.url)) {
             return scripts.url.reduce((sequence, url) => {
                 return sequence.then(() => {
@@ -201,6 +208,8 @@ var Manic = new function () {
                     }
                 });
             }, Promise.resolve());
+        // otherwise it is a string
+        // @todo: needs to be tested for several types
         } else {
             return self.getJS(scripts.url).then(response => {
                 self.insertScript(response, scripts);
