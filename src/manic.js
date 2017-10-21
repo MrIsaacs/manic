@@ -1,42 +1,66 @@
 /**
- * @fileOverview Just another JavaScript library.
+ * Just another JavaScript library.
+ * @access public
  * @author Ivan Ilic <me@mrisaacs.org>
  * @version 2.2.0
  */
-/**
- * Main class
- *
- * More coming soon...
- * @class
- */
 class Manic {
     /**
-     * Initialize Manic
-     * @constructor
+     * Constructs the current version
      */
     constructor () {
+        let services = Symbol.for('services');
+        /**
+         * @type {Object}
+         * @property {number} major
+         * @property {number} minor
+         * @property {number} patch
+         */
         this._version = {
             major: 2,
             minor: 2,
             patch: 0
         };
+        /**
+         * @type {Object}
+         */
         this._events = {};
-        /** @todo: change request properties */
+        /**
+         * @type {Object}
+         * @todo change request properties
+         */
         this._request = {
             id : 1,
             type : "info",
             slug : "home"
         };
-        this._response = {};
+        /**
+         * @type {Object}
+         */
+        this._response = {
+            // not in use now
+        };
+        /**
+         * @type {Object}
+         * @property {Object} container
+         * @property {Object} content
+         */
         this._contextMgr = {
             container : "",
             content : ""
         };
 
-        var services = Symbol.for('services');
+        /**
+         * Iterable collection of services. Each service contains the `url` and
+         * `init` function, which is called in `loadServices`.
+         * @type {Object}
+         * @property {Service} [framework] - The framework of your desire.
+         * @property {Service} [markdown] - The markdown of your wish.
+         * @property {Service} [route] - The route service of your use.
+         */
         this[services] = {
             /**
-             * Service's iterable protocol. Scope of _this_ is attached to the
+             * Service's iterator protocol. Scope of _this_ is attached to the
              * class. However as from _next_ function's scope we can get the
              * scope of the services Symbol and pass it for information
              * gatering.
@@ -53,12 +77,18 @@ class Manic {
                 next: function next () {
                     // scope of this remains to the symbol
                     if (this._first) {
+                        /**
+                         * Use to indicate wheter the Service iterator is
+                         * running for the first time. If so, then initialize the
+                         * object.
+                         * @type {boolean}
+                         */
                         this._first = false;
                         this.init(this);
                     }
                     return {
-                      done: this.items.length === this._i ,
-                      value: this.services[this.items[this._i++]]
+                        done: this.items.length === this._i ,
+                        value: this.services[this.items[this._i++]]
                     };
                 }
             }),
@@ -99,7 +129,9 @@ class Manic {
                             "?" + searchParams.toString()
                         );
 
-                        /** @todo: in the end it must render a node, not a slug */
+                        /**
+                         * @todo: in the end it must render a node, not a slug
+                         */
                         this.render(this._request.slug);
                     });
                 }
@@ -188,30 +220,13 @@ class Manic {
     }
 
     /**
-     * Return current version number.
-     * @returns {string}
+     * Returns current version number.
+     * @return {string} - Returns the version number as `major.minor.patch`
      */
     get version() {
         return this._version.major + "."
              + this._version.minor + "."
              + this._version.patch;
-    }
-
-    /**
-     * @todo: redefine scriptCollection
-     *
-     * @return (string) Returns Scrtipts of each instanciated script at the
-     *                  bottom of the document, beofre body ends.
-     */
-    get scriptCollection() {
-        var services = this[Symbol.for('services')];
-        var sequence = Promise.resolve();
-
-        for (let service of services) {
-            sequence = sequence.then(() => {
-                return this.loadServices(service);
-            })
-        }
     }
 
     /**
@@ -262,6 +277,9 @@ class Manic {
         }
     }
 
+    /**
+     * @todo write docs about it...
+     */
     isArray(e){
         if (Object.prototype.toString.call( e ) === "[object Array]") {
             return true;
@@ -269,6 +287,10 @@ class Manic {
             return false;
         }
     }
+
+    /**
+     * @todo write docs about it...
+     */
     isPromise(e){
         if (Object.prototype.toString.call(e) === "[object Promise]") {
             return true;
@@ -277,6 +299,9 @@ class Manic {
         }
     }
 
+    /**
+     * @todo write docs about it...
+     */
     loadJS(url) {
         "use strict";
         /**
@@ -287,10 +312,14 @@ class Manic {
         return new Promise((resolve, reject) => {
             // Do the usual XHR stuff
             var req = new XMLHttpRequest();
-            /** @todo: extract paht to library */
+            /**
+             * @todo: extract paht to library
+             */
             req.open("GET", "./js/" + url + ".js");
 
-            /** @todo: create req.state for eventhandling */
+            /**
+             * @todo: create req.state for eventhandling
+             */
             req.onload = () => {
                 // appends index to response
                 if (req.status == 200) {
@@ -317,11 +346,16 @@ class Manic {
         });
     }
 
+    /**
+     * @todo write docs about it...
+     */
     loadJSON(url) {
         return new Promise(function(resolve, reject){
             // Do the usual XHR stuff
             var req = new XMLHttpRequest();
-            /** @todo: extract paht to library */
+            /**
+             * @todo: extract paht to library
+             */
             url = "./data/" + url + ".json";
             req.open("GET", url);
 
@@ -350,8 +384,8 @@ class Manic {
     }
 
     /**
-     * Iteration through loadScripts must yield the next services from the
-     * event stack.
+     * Load each service and initialize if function _init_ exists.
+     * @param {Service} service
      */
     loadServices(service) {
         if (this.isArray(service.url)) {
@@ -379,6 +413,9 @@ class Manic {
         }
     }
 
+    /**
+     * @todo write docs about it...
+     */
     addScript(response, script) {
         var s = document.createElement("script");
         s.innerHTML = response.script;
@@ -386,7 +423,27 @@ class Manic {
         document.body.appendChild(s);
     }
 
-    /** @todo: template should be configured in settings */
+    /**
+     * Iterate through services and call `loadServices` for each service.
+     * @todo: redefine scriptCollection
+     *
+     * @return {string} Injects scrtipts for each needed service at the
+     *                  bottom of the document, before body ends.
+     */
+    get scriptCollection() {
+        var services = this[Symbol.for('services')];
+        var sequence = Promise.resolve();
+
+        for (let service of services) {
+            sequence = sequence.then(() => {
+                return this.loadServices(service);
+            });
+        }
+    }
+
+    /**
+     * @todo: template should be configured in settings
+     */
     render(site) {
         this.loadJSON(site).then(response => {
             // start loading animation
@@ -396,19 +453,25 @@ class Manic {
                 $$(".shimmer-layer").addClass("no-anim");
                 $$(".shimmer-layer").removeClass("hidden");
 
-                /** @todo: check if the same info were requested */
+                /**
+                 * @todo: check if the same info were requested
+                 */
                 if ($("list")) {
                     $("list").destroy();
                 }
             } else if (this._request.type === "list") {
-                /** @todo: check if the same list were requested */
+                /**
+                 * @todo: check if the same list were requested
+                 */
                 if ($("detail")) {
                     $("detail").destroy();
                 }
             }
             return response;
         }).then(response => {
-            /** @todo: extract info and list as functions */
+            /**
+             * @todo: extract info and list as functions
+             */
             // INFO
             if(this._request.type === "info") {
                 var requestID   = this._request.id;
@@ -447,7 +510,9 @@ class Manic {
                     }).inject(detail);
                 }
 
-                /** @todo: exchange document title with a variable */
+                /**
+                 * @todo: exchange document title with a variable
+                 */
                 document.title = "Manic - " + article.title;
 
                 $("main-title").set("text", article.title);
@@ -507,7 +572,9 @@ class Manic {
                     }
                 }
 
-                /** @todo: exchange document title with a variable */
+                /**
+                 * @todo: exchange document title with a variable
+                 */
                 document.title = "Manic - ";// + article.title;
             }
 
@@ -526,7 +593,24 @@ class Manic {
 
     /**
      * @since 1.1.2
-     * @returns {?Object}
+     * @param {Object} db
+     * @param {string} key
+     * @return {?Object} Returns the next data payload of given key.
+     */
+    next (db, key) {
+        "use strict";
+        var next = db.index[key] - 1;
+        if(next < 0) {
+            return null;
+        }
+        return db.data[next];
+    }
+
+    /**
+     * @since 1.1.2
+     * @param {Object} db
+     * @param {string} key
+     * @return {?Object} Returns the previous data payload of given key.
      */
     prev(db, key) {
         "use strict";
@@ -537,18 +621,5 @@ class Manic {
         return db.data[next];
     }
 
-    /**
-     * @since 1.1.2
-     * @returns {?Object}
-     */
-    next (db, key) {
-        "use strict";
-        var next = db.index[key] - 1;
-        if(next < 0) {
-            return null;
-        }
-        return db.data[next];
-    }
 }
-
 const manic = new Manic();
