@@ -1,0 +1,21 @@
+{
+  "index" : {
+    "2" : 0,
+    "1" : 1
+  },
+  "data" : [{
+    "id"    : "2",
+    "link"  : "docs",
+    "title" : "Home",
+    "short" : "A JavaScript framework manager.",
+    "body"  : "More coming soon...\n| Classes | Members | Methods |\n|:-|:-:|:-:|\n| <a href=\"#docs/2\">Manic</a> | version | next() |\n| | | prev() |\n# manic.js\nMain project file.\n> Version: 2.1.1<br> Author: Ivan Ilic<br> Source: manic.js, line 1\n",
+    "date"  : "Apr 13, 2017 21:14:00"
+  }, {
+    "id"    : "1",
+    "link"  : "docs",
+    "title" : "Class: Manic",
+    "short" : "Main class for managing different javascript frameworks.",
+    "body"  : "More coming soon...\n| Classes | Members | Methods |\n|:-|:-:|:-:|\n| <a href=\"#docs/2\">Manic</a> | version | next() |\n| | | prev() |\n# *Manic*\n\n---\nMain class for managing different javascript frameworks.\n# *Constructor*\n\n---\n`new Manic()`\n\nInitialize Manic\n> Source: manic.js, line 10\n\n# *Members*\n\n---\n`version` \n> Source: manic.js, line 145\n\n# *Methods*\n\n`next()` → (nullable) {Object}\n> Since: 1.1.2<br> Source:manic.js, line 437\n\n### Returns:\nType: _Object_\n\n`prev()` → (nullable) {Object}\n> Since: 1.1.2<br>Source: manic.js, line 424\n\n### Returns:\nType: _Object_",
+    "date"  : "Apr 13, 2017 21:14:00"
+  }]
+}
