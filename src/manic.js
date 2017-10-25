@@ -6,7 +6,7 @@
  */
 class Manic {
     /**
-     * Constructs the current version
+     * Initialize events, requests and services. Events
      */
     constructor () {
         let services = Symbol.for('services');
@@ -23,10 +23,19 @@ class Manic {
         };
         /**
          * @type {Object}
+         * @property {string} eventName
+         * @property {function} fn
+         * @todo Make CustomEvents. See Mozilla documentation link.
+         * @see https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
          */
         this._events = {};
         /**
          * @type {Object}
+         * @property {number} id=1 Id of requested article.
+         * @property {string} type=info Defines what type of data is requested.
+         *                         `type` can be `info` or `list`.
+         * @property {string} slug=home Defines what page is requested to be
+         *                         rendered.
          * @todo change request properties
          */
         this._request = {
@@ -36,6 +45,7 @@ class Manic {
         };
         /**
          * @type {Object}
+         * @todo Handle response via member.
          */
         this._response = {
             // not in use now
@@ -53,7 +63,7 @@ class Manic {
         /**
          * Iterable collection of services. Each service contains the `url` and
          * `init` function, which is called in `loadServices`.
-         * @type {Object}
+         * @type {Service}
          * @property {Service} [framework] - The framework of your desire.
          * @property {Service} [markdown] - The markdown of your wish.
          * @property {Service} [route] - The route service of your use.
@@ -79,8 +89,8 @@ class Manic {
                     if (this._first) {
                         /**
                          * Use to indicate wheter the Service iterator is
-                         * running for the first time. If so, then initialize the
-                         * object.
+                         * running for the first time. If so, then initialize
+                         * the services into an item list.
                          * @type {boolean}
                          */
                         this._first = false;
@@ -106,8 +116,14 @@ class Manic {
                     let url = new URL(window.location.href);
                     let searchParams = new URLSearchParams(url.search);
 
-                    // update url if request property has changed
+                    /**
+                     * @todo If URL changes, pass over search params trigger
+                     * reuqestchange with the
+                     */
                     this.on("requestchange", () => {
+                        /**
+                         * @todo This block must be triggerd on urlchange.
+                         */
                         searchParams.set("q", this._request.slug);
 
                         if(this._request.type === "list") {
@@ -144,8 +160,8 @@ class Manic {
                 refresh: "undefined",
                 init: () => {
                     /**
-                     * @todo: it seems that the click event is trigger twice.
-                     *        prevent eventlistener in the same custom event.
+                     * @todo It seems that the click event is trigger twice.
+                     * Prevent eventlistener in the same custom event.
                      */
                     this.on("urlchange", () => {
                         let i = document.getElementsByTagName("a").length;
@@ -159,7 +175,8 @@ class Manic {
                                 this._request.slug = event.target.dataset.link;
 
                                 /**
-                                 * @todo: move requestchange basics to the core.
+                                 * @todo move requestchange basics to the core.
+                                 * @todo pass over _request parameter
                                  */
                                 this.trigger("requestchange", {
                                     id : event.target.dataset.hasOwnProperty("id") ? event.target.dataset.id : null,
@@ -183,10 +200,8 @@ class Manic {
         /**
          * Defines the urlchange event. Call requestchange event if url
          * has changed. / Tracks an urlchange event occurs.
-         *
-         * @todo: it seems that the click event is trigger twice.
-         *        prevent same eventlistener in the
-         *        same custom event.
+         * @todo It seems that the click event is trigger twice. Pprevent same
+         * eventlistener in the same custom event.
          */
         this.on("urlchange", () => {
             let url = new URL(window.location.href);
@@ -221,7 +236,8 @@ class Manic {
 
     /**
      * Returns current version number.
-     * @return {string} - Returns the version number as `major.minor.patch`
+     * @since 2.0.0
+     * @return {string} Returns the version number as `major.minor.patch`.
      */
     get version() {
         return this._version.major + "."
@@ -232,9 +248,9 @@ class Manic {
     /**
      * Creates a function on the fly, which can be invoced by the
      * trigger function.
-     *
-     * @param eventName Functionname to be created
-     * @param fn The function itself
+     * @param {string} eventName Functionname to be created
+     * @param {function} [fn] Function which will be called with respect to the
+     * `eventName`.
      */
     on(eventName, fn) {
         this._events[eventName] = this._events[eventName] || [];
@@ -244,11 +260,10 @@ class Manic {
     /**
      * Deletes a function with a given name an its function. It can not be
      * triggered afterwards.
-     *
-     * @todo: events must also be mutable
-     *
-     * @param eventName
-     * @param fn
+     * @todo events must also be mutable
+     * @param {string} eventName `eventName` to be deleted.
+     * @param {function} [fn] Function which will be deleted with respect to
+     * `eventName`
      */
     off(eventName, fn) {
         if (this._events[eventName]) {
@@ -263,11 +278,9 @@ class Manic {
 
     /**
      * Triggers eventName as a function and assigns data as parameter.
-     *
      * @todo: description of data is needed
-     *
-     * @param eventName Function which will be called
-     * @param data Parameter for assigning to function
+     * @param {string} eventName Function which will be called
+     * @param {Object} [data] Parameter for assigning to function
      */
     trigger(eventName, data) {
         if (this._events[eventName]) {
@@ -278,6 +291,7 @@ class Manic {
     }
 
     /**
+     * @since 2.0.0
      * @todo write docs about it...
      */
     isArray(e){
@@ -289,7 +303,9 @@ class Manic {
     }
 
     /**
+     * @since 2.0.0
      * @todo write docs about it...
+     * @see https://stackoverflow.com/questions/27746304/how-do-i-tell-if-an-object-is-a-promise/45762727#45762727
      */
     isPromise(e){
         if (Object.prototype.toString.call(e) === "[object Promise]") {
@@ -300,7 +316,10 @@ class Manic {
     }
 
     /**
+     * @since 2.0.0
      * @todo write docs about it...
+     * @param {string} url URL is taken from {@Service} to request for its
+     * script.
      */
     loadJS(url) {
         "use strict";
@@ -347,6 +366,7 @@ class Manic {
     }
 
     /**
+     * @since 2.0.0
      * @todo write docs about it...
      */
     loadJSON(url) {
@@ -384,7 +404,18 @@ class Manic {
     }
 
     /**
-     * Load each service and initialize if function _init_ exists.
+     * @deprecated
+     * @since 2.0.0
+     * @param {Service} service
+     */
+    loadScripts(service) {
+        loadServices(service)
+    }
+
+    /**
+     * Load service and initialize if function _init_ exists. If `service.url`
+     * is an array of URL's, then load every index, before calling _init_
+     * @since 2.2.0
      * @param {Service} service
      */
     loadServices(service) {
@@ -402,8 +433,6 @@ class Manic {
                     }
                 });
             }, Promise.resolve());
-        // otherwise it is a string
-        // @todo: needs to be tested for several types
         } else {
             return this.loadJS(service.url).then(response => {
                 this.addScript(response, service);
@@ -416,7 +445,20 @@ class Manic {
     }
 
     /**
-     * @todo write docs about it...
+     * @deprecated Use `addScript` instead.
+     * @since 2.0.0
+     */
+    insertScript(response, script) {
+        this.addScript(response, script);
+    }
+
+    /**
+     * Adds script to document before body ends. Called by `loadServices`.
+     * @todo Bind each script with its service.
+     * @since 2.2.0
+     * @param {Object} response
+     * @param script !NOT USED! Passed over parameter doesn't do anything.
+     * @see https://stackoverflow.com/questions/950087/how-do-i-include-a-javascript-file-in-another-javascript-file/950146#950146
      */
     addScript(response, script) {
         var s = document.createElement("script");
@@ -427,8 +469,8 @@ class Manic {
 
     /**
      * Iterate through services and call `loadServices` for each service.
-     * @todo: redefine scriptCollection
-     *
+     * @since 2.0.0
+     * @todo redefine scriptCollection
      * @return {string} Injects scrtipts for each needed service at the
      *                  bottom of the document, before body ends.
      */
@@ -444,7 +486,13 @@ class Manic {
     }
 
     /**
-     * @todo: template should be configured in settings
+     * @todo should be possible: `content.addClass()`, `progressbar.addClass()`
+     * or `progressbar.removeClass()`
+     * @since 2.2.0
+     * @todo template should be configured in settings
+     * @todo `render` use _mootools_ selector to get a desired element. These
+     * functions must be provided hy the `[services]` middleware stack for a
+     * given service.
      */
     render(site) {
         this.loadJSON(site).then(response => {
@@ -591,6 +639,14 @@ class Manic {
                 // function do not exist
             }
         });
+    }
+
+    /**
+     * @deprecated User render instead.
+     * @since 2.1.0
+     */
+    getContent(site) {
+        this.render(site);
     }
 
     /**
